@@ -1,0 +1,119 @@
+
+Create Books Tables
+
+CREATE TABLE books (
+    book_id SERIAL PRIMARY KEY,
+    title VARCHAR(100),
+    author VARCHAR(100),
+    genre VARCHAR(50),
+    published_year INT
+);
+
+
+ Create Members Table
+
+CREATE TABLE members (
+    member_id SERIAL PRIMARY KEY,
+    member_name VARCHAR(100),
+    city VARCHAR(50),
+    join_date DATE
+);
+
+
+ Create Borrow Records Table
+
+CREATE TABLE borrow_records (
+    borrow_id SERIAL PRIMARY KEY,
+    book_id INT,
+    member_id INT,
+    borrow_date DATE,
+    return_date DATE,
+    FOREIGN KEY (book_id) REFERENCES books(book_id),
+    FOREIGN KEY (member_id) REFERENCES members(member_id)
+);
+
+
+ Insert Data into Books
+
+INSERT INTO books (title, author, genre, published_year)
+VALUES
+('Atomic Habits', 'James Clear', 'Self Help', 2018),
+('Clean Code', 'Robert Martin', 'Technology', 2008),
+('Deep Work', 'Cal Newport', 'Productivity', 2016),
+('The Alchemist', 'Paulo Coelho', 'Fiction', 1988),
+('The Hobbit', 'J.R.R. Tolkien', 'Fantasy', 1937);
+
+
+-- Insert Data into Members
+
+INSERT INTO members (member_name, city, join_date)
+VALUES
+('Alice', 'Chennai', '2024-01-15'),
+('Bob', 'Coimbatore', '2024-02-10'),
+('Charlie', 'Madurai', '2024-03-20'),
+('Diana', 'Salem', '2024-04-05');
+
+ Insert Data into Borrow Records
+
+INSERT INTO borrow_records (book_id, member_id, borrow_date, return_date)
+VALUES
+(1, 1, '2025-01-05', '2025-01-15'),
+(2, 2, '2025-01-08', '2025-01-20'),
+(3, 2, '2025-03-10', '2025-03-18'),
+(4, 1, '2025-02-10', '2025-02-25'),
+(5, 4, '2025-03-01', '2025-03-15'),
+(1, 3, '2025-04-01', '2025-04-10'),
+(4, 3, '2025-02-15', '2025-02-28');
+
+
+ Analysis Queries
+
+
+-- Total Books
+SELECT COUNT(*) AS total_books
+FROM books;
+
+-- Total Members
+SELECT COUNT(*) AS total_members
+FROM members;
+
+-- Total Borrow Records
+SELECT COUNT(*) AS total_borrows
+FROM borrow_records;
+
+-- Books by Genre
+SELECT genre, COUNT(*) AS total_books
+FROM books
+GROUP BY genre;
+
+-- Most Borrowed Books
+SELECT
+    b.title,
+    COUNT(br.borrow_id) AS borrow_count
+FROM books b
+JOIN borrow_records br
+ON b.book_id = br.book_id
+GROUP BY b.title
+ORDER BY borrow_count DESC;
+
+-- Borrow Count by Author
+SELECT
+    b.author,
+    COUNT(br.borrow_id) AS borrow_count
+FROM books b
+JOIN borrow_records br
+ON b.book_id = br.book_id
+GROUP BY b.author
+ORDER BY borrow_count DESC;
+
+-- Member Borrow History
+SELECT
+    m.member_name,
+    b.title,
+    br.borrow_date,
+    br.return_date
+FROM borrow_records br
+JOIN members m
+ON br.member_id = m.member_id
+JOIN books b
+ON br.book_id = b.book_id;
